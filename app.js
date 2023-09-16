@@ -7,11 +7,11 @@ const connectDatabase = require('./config/database');
 // Setting up config.env file variables
 dotenv.config({path : './config/config.env'})
 
-// Connecting to databse
-connectDatabase();
-
 // Setup body parser
 app.use(express.json());
+
+// Connecting to databse
+connectDatabase();
 
 // Importing all routes
 const jobs = require('./routes/jobs');
