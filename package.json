@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app",
-    "prod":"SET NODE_ENV=production & node app.js"
+    "prod": "SET NODE_ENV=production & node app.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "dotenv": "^16.3.1",
+    "mongodb": "^6.1.0",
+    "mongoose": "^7.5.2",
     "nodemon": "^3.0.1"
   }
 }
