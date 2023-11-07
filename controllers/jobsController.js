@@ -12,6 +12,27 @@ exports.getJobs = async (req, res, next) => {
     });
 };
 
+// Get a single job with id and slug   =>  /api/v1/job/:id/:slug
+exports.getJob = async (req, res, next) => {
+
+    const job = await Job.find({ $and: [{ _id: req.params.id }, { slug: req.params.slug }] }).populate({
+        path: 'user',
+        select: 'name'
+    });
+
+    if (!job || job.length == 0) {
+        res.status(404).json({
+            success: true,
+            message: 'Job not found'
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        data: job
+    });
+};
+
 // Get all Jobs  =>  /api/v1/jobs
 exports.newJob = async (req, res, next) => {
     let job = {};
