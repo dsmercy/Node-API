@@ -43,7 +43,11 @@ class JobsController {
             let job = {};
             await Job.create(req.body)
                 .then(res => job = res)
-                .catch(err => console.log('Error occured while saving data', err));
+                .catch(
+                    err => {
+                        const message = Object.values(err.errors).map(value => value.message);
+                        return apiResponse.validationErrorWithData(res, message, err)
+                    });
 
             return apiResponse.successResponseWithData(res, "Job Created!", job);
         } catch (error) {
