@@ -1,91 +1,102 @@
 const Job = require('../models/jobs');
+const apiResponse = require("../helpers/apiResponse");
 
-// Get all Jobs  =>  /api/v1/jobs
-exports.getJobs = async (req, res, next) => {
 
-    const jobs = await Job.find();
-
-    res.status(200).json({
-        success: true,
-        results: jobs.length,
-        data: jobs
-    });
-};
-
-// Get a single job with id and slug   =>  /api/v1/job/:id/:slug
-exports.getJob = async (req, res, next) => {
-
-    const job = await Job.find({ $and: [{ _id: req.params.id }, { slug: req.params.slug }] }).populate({
-        path: 'user',
-        select: 'name'
-    });
-
-    if (!job || job.length == 0) {
-        res.status(404).json({
-            success: true,
-            message: 'Job not found'
-        });
+class JobsController {
+    constructor(jobModel) {
+        this.Job = jobModel;
     }
 
-    res.status(200).json({
-        success: true,
-        data: job
-    });
-};
+    // Get all Jobs  =>  /api/v1/jobs  
+    getJobs = async (req, res, next) => {
+        try {
+            const jobs = await Job.find();
+            // Uncomment the line below if you want to intentionally throw an error for testing
+            throw new Error('This is a custom error message');
+            return apiResponse.successResponseWithData(res, 'Operation success', jobs);
+        } catch (error) {
+            // Pass the error to the next middleware
+            next(error);
+        }
+    };
 
-// Get all Jobs  =>  /api/v1/jobs
-exports.newJob = async (req, res, next) => {
-    let job = {};
-    await Job.create(req.body)
-        .then(res => job = res)
-        .catch(err => console.log('Error occured while saving data', err));
+    // Get a single job with id and slug   =>  /api/v1/job/:id/:slug
+    getJob = async (req, res, next) => {
+        try {
+            Job.findOne({ _id: req.params.id, slug: req.params.slug }, "_id title description email lastDate").then((job) => {
+                if (job !== null) {
+                    return apiResponse.successResponseWithData(res, "Operation success", job);
+                } else {
+                    return apiResponse.successResponseWithData(res, "Job not found", {});
+                }
+            });
+        } catch (error) {
+            // Pass the error to the next middleware
+            next(error);
+        }
+    };
 
-    res.status(200).json({
-        success: true,
-        message: 'Job Created!',
-        data: job
-    });
-};
 
-// Update a Job  =>  /api/v1/job/:id
-exports.updateJob = async (req, res, next) => {
-    let job = await Job.findById(req.params.id);
+    // Get all Jobs  =>  /api/v1/jobs
+    newJob = async (req, res, next) => {
+        try {
+            let job = {};
+            await Job.create(req.body)
+                .then(res => job = res)
+                .catch(err => console.log('Error occured while saving data', err));
 
-    if (!job) {
-        res.status(404).json({
-            success: true,
-            message: 'Job not found'
-        });
-    }
+            return apiResponse.successResponseWithData(res, "Job Created!", job);
+        } catch (error) {
+            // Pass the error to the next middleware
+            next(error);
+        }
+    };
 
-    job = await Job.findByIdAndUpdate(req.params.id, req.body, {
-        new: true,
-        runValidators: true,
-        useFindAndModify: false
-    });
+    // Update a Job  =>  /api/v1/job/:id
+    updateJob = async (req, res, next) => {
+        try {
+            let job = await Job.findById(req.params.id);
+            if (!job) {
+                res.status(404).json({
+                    success: true,
+                    message: 'Job not found'
+                });
+            }
 
-    res.status(200).json({
-        success: true,
-        message: 'Job is updated.',
-        data: job
-    });
-};
+            job = await Job.findByIdAndUpdate(req.params.id, req.body, {
+                new: true,
+                runValidators: true,
+                useFindAndModify: false
+            });
 
-// Update a Job  =>  /api/v1/job/:id
-exports.deleteJob = async (req, res, next) => {
-    let job = await Job.findById(req.params.id);
+            return apiResponse.successResponseWithData(res, "Job updated!", job);
+        } catch (error) {
+            // Pass the error to the next middleware
+            next(error);
+        }
+    };
 
-    if (!job) {
-        res.status(404).json({
-            success: true,
-            message: 'Job not found'
-        });
-    }
+    // Update a Job  =>  /api/v1/job/:id
+    deleteJob = async (req, res, next) => {
+        try {
+            let job = await Job.findById(req.params.id);
 
-    job = await Job.findByIdAndDelete(req.params.id);
+            if (!job) {
+                res.status(404).json({
+                    success: true,
+                    message: 'Job not found'
+                });
+            }
 
-    res.status(200).json({
-        success: true,
-        message: 'Job is deleted.'
-    });
-};
+            job = await Job.findByIdAndDelete(req.params.id);
+
+            return apiResponse.successResponse(res, "Job deleted!");
+        } catch (error) {
+            // Pass the error to the next middleware
+            next(error);
+        }
+    };
+}
+
+
+module.exports = new JobsController();
