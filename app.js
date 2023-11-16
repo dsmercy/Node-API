@@ -3,7 +3,7 @@ const app = express();
 
 const dotenv = require('dotenv');
 const connectDatabase = require('./config/database');
-
+const apiResponse = require("./helpers/apiResponse");
 
 const errorMiddleware = require('./middlewares/errors');
 
@@ -20,6 +20,11 @@ connectDatabase();
 const jobs = require('./routes/jobsRoute');
 
 app.use('/api/v1', jobs);
+// Handle unhandled routes
+app.all('*', (req, res, next) => {
+    return apiResponse.notFoundResponse(res, `provided route: ${req.url} not found`);
+    next();
+});
 
 // Global Error Handling Middleware
 app.use(errorMiddleware);

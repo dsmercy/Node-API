@@ -12,7 +12,7 @@ class JobsController {
         try {
             const jobs = await Job.find();
             // Uncomment the line below if you want to intentionally throw an error for testing
-            throw new Error('This is a custom error message');
+            // throw new Error('This is a custom error message');
             return apiResponse.successResponseWithData(res, 'Operation success', jobs);
         } catch (error) {
             // Pass the error to the next middleware
