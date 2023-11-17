@@ -1,6 +1,6 @@
 const Job = require('../models/jobs');
 const apiResponse = require("../helpers/apiResponse");
-
+const APIFilters = require("../utils/apiFilters");
 
 class JobsController {
     constructor(jobModel) {
@@ -10,8 +10,11 @@ class JobsController {
     // Get all Jobs  =>  /api/v1/jobs  
     getJobs = async (req, res, next) => {
         try {
-            const jobs = await Job.find();
-            // Uncomment the line below if you want to intentionally throw an error for testing
+            const apiFilters = new APIFilters(Job.find(), req.query)
+                .filter();
+
+            const jobs = await apiFilters.query;
+
             // throw new Error('This is a custom error message');
             return apiResponse.successResponseWithData(res, 'Operation success', jobs);
         } catch (error) {
