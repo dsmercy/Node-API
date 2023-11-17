@@ -12,7 +12,10 @@ class JobsController {
         try {
             const apiFilters = new APIFilters(Job.find(), req.query)
                 .filter()
-                .sort();
+                .sort()
+                .limitFields()
+                .searchByQuery()
+                .pagination();
 
             const jobs = await apiFilters.query;
 
