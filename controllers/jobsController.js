@@ -11,7 +11,8 @@ class JobsController {
     getJobs = async (req, res, next) => {
         try {
             const apiFilters = new APIFilters(Job.find(), req.query)
-                .filter();
+                .filter()
+                .sort();
 
             const jobs = await apiFilters.query;
 
