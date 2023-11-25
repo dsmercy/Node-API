@@ -24,7 +24,7 @@ class UsersController {
             const userJson = { ...user._doc };
             delete userJson.password;
 
-const token = user.getJwtToken();
+            const token = user.getJwtToken();
 
             return apiResponse.successResponseWithData(res, `JWT Token: ${token}`, userJson);
         } catch (error) {
@@ -32,6 +32,46 @@ const token = user.getJwtToken();
             next(error);
         }
     }
+
+    // Login user  =>  /api/v1/login
+    loginUser = async (req, res, next) => {
+        try {
+            const { email, password } = req.body;
+
+            // Checks if email or password is entered by user
+            if (!email || !password) {
+                return apiResponse.validationErrorWithData(res, `Please enter valid email & Password`);
+            }
+
+            // Finding user in database
+            const user = await User.findOne({ email }).select('+password');
+
+            if (user) {
+                const isPasswordMatched = await user.comparePassword(password);
+                if (!isPasswordMatched) {
+                    return apiResponse.unauthorizedResponse(res, `Invalid Email or Password`);
+                }
+                const token = user.getJwtToken();
+                var response = {token}
+                return apiResponse.successResponseWithData(res, `Authorized successfully`,response);
+            }else{
+                return apiResponse.unauthorizedResponse(res, `Invalid Email`);
+            }
+
+            // Check if password is correct
+            const isPasswordMatched = await user.comparePassword(password);
+
+            if (!isPasswordMatched) {
+                return next(new ErrorHandler('Invalid Email or Password', 401));
+            }
+
+            sendToken(user, 200, res);
+        } catch (error) {
+            // Pass the error to the next middleware
+            next(error);
+        }
+
+    };
 
 }
 
