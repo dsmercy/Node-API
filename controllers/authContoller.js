@@ -52,8 +52,8 @@ class UsersController {
                 if (!isPasswordMatched) {
                     return apiResponse.unauthorizedResponse(res, `Invalid Email or Password`);
                 }
-                
-                sendToken(user,200,res);
+
+                sendToken(user,res);
             }else{
                 return apiResponse.unauthorizedResponse(res, `Invalid Email`);
             }
