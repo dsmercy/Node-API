@@ -24,7 +24,9 @@ class UsersController {
             const userJson = { ...user._doc };
             delete userJson.password;
 
-            return apiResponse.successResponseWithData(res, 'User Created', userJson);
+const token = user.getJwtToken();
+
+            return apiResponse.successResponseWithData(res, `JWT Token: ${token}`, userJson);
         } catch (error) {
             // Pass the error to the next middleware
             next(error);
