@@ -47,14 +47,8 @@ class JobsController {
     // Get all Jobs  =>  /api/v1/jobs
     newJob = async (req, res, next) => {
         try {
-            let job = {};
-            await Job.create(req.body)
-                .then(res => job = res)
-                .catch(
-                    err => {
-                        const message = Object.values(err.errors).map(value => value.message);
-                        return apiResponse.validationErrorWithData(res, message, err)
-                    });
+            // let job = {};
+            let job =  await Job.create(req.body);
 
             return apiResponse.successResponseWithData(res, "Job Created!", job);
         } catch (error) {

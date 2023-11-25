@@ -18,8 +18,10 @@ connectDatabase();
 
 // Importing all routes
 const jobs = require('./routes/jobsRoute');
+const auth = require('./routes/authRoute');
 
 app.use('/api/v1', jobs);
+app.use('/api/v1', auth);
 // Handle unhandled routes
 app.all('*', (req, res, next) => {
     return apiResponse.notFoundResponse(res, `provided route: ${req.url} not found`);
