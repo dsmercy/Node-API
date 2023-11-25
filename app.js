@@ -4,6 +4,7 @@ const app = express();
 const dotenv = require('dotenv');
 const connectDatabase = require('./config/database');
 const apiResponse = require("./helpers/apiResponse");
+const cookieParser = require('cookie-parser');
 
 const errorMiddleware = require('./middlewares/errors');
 
@@ -12,6 +13,8 @@ dotenv.config({ path: './config/config.env' })
 
 // Setup body parser
 app.use(express.json());
+// Set cookie parser
+app.use(cookieParser());
 
 // Connecting to databse
 connectDatabase();

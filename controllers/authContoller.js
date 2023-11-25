@@ -1,6 +1,7 @@
 const { request } = require('express');
 const User = require('../models/users');
 const apiResponse = require("../helpers/apiResponse");
+const sendToken = require('../utils/jwtToken');
 
 
 class UsersController {
@@ -51,21 +52,11 @@ class UsersController {
                 if (!isPasswordMatched) {
                     return apiResponse.unauthorizedResponse(res, `Invalid Email or Password`);
                 }
-                const token = user.getJwtToken();
-                var response = {token}
-                return apiResponse.successResponseWithData(res, `Authorized successfully`,response);
+                
+                sendToken(user,200,res);
             }else{
                 return apiResponse.unauthorizedResponse(res, `Invalid Email`);
             }
-
-            // Check if password is correct
-            const isPasswordMatched = await user.comparePassword(password);
-
-            if (!isPasswordMatched) {
-                return next(new ErrorHandler('Invalid Email or Password', 401));
-            }
-
-            sendToken(user, 200, res);
         } catch (error) {
             // Pass the error to the next middleware
             next(error);
