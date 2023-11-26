@@ -2,6 +2,8 @@ const { request } = require('express');
 const User = require('../models/users');
 const apiResponse = require("../helpers/apiResponse");
 const sendToken = require('../utils/jwtToken');
+const sendEmail = require('../utils/sendEmail');
+
 
 
 class UsersController {
@@ -51,13 +53,53 @@ class UsersController {
                     return apiResponse.unauthorizedResponse(res, `Invalid Email or Password`);
                 }
 
-                sendToken(user,res);
-            }else{
+                sendToken(user, res);
+            } else {
                 return apiResponse.unauthorizedResponse(res, `Invalid Email`);
             }
         } catch (error) {
             // Pass the error to the next middleware
             next(error);
+        }
+
+    };
+
+    // Forgot Password  =>  /api/v1/password/forgot
+    forgotPassword = async (req, res, next) => {
+        const user = await User.findOne({ email: req.body.email });
+
+        // Check user email is database
+        if (!user) {
+            return apiResponse.notFoundResponse(res, `No user found with this email.`);
+        }
+
+        // Get reset token
+        const resetToken = user.getResetPasswordToken();
+
+        await user.save({ validateBeforeSave: false });
+
+        // Create reset password url
+        const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/password/reset/${resetToken}`;
+
+        const message = `Your password reset link is as follow:\n\n${resetUrl}\n\n If you have not request this, then please ignore that.`
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Jobbee-API Password Recovery',
+                message
+            });
+
+            res.status(200).json({
+                success: true,
+                message: `Email sent successfully to: ${user.email}`
+            });
+        } catch (error) {
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+
+            await user.save({ validateBeforeSave: false });
+            return apiResponse.ErrorResponse(res, `Email is not sent.`,error);
         }
 
     };

@@ -6,5 +6,6 @@ const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 router.route('/register').post(isAuthenticatedUser, authorizeRoles('admin'), authController.registerUser);
 router.route('/login').post(authController.loginUser);
+router.route('/password/forgot').post(authController.forgotPassword);
 
 module.exports = router;
