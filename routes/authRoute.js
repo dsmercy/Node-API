@@ -8,5 +8,6 @@ router.route('/register').post(isAuthenticatedUser, authorizeRoles('admin'), aut
 router.route('/login').post(authController.loginUser);
 router.route('/password/forgot').post(authController.forgotPassword);
 router.route('/password/reset/:token').put(authController.resetPassword);
+router.route('/logout').get(authController.logout);
 
 module.exports = router;

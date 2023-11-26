@@ -137,6 +137,16 @@ class UsersController {
         }
     };
 
+    // Logout user   =>   /api/v1/logout
+    logout = async (req, res, next) => {
+        res.cookie('token', 'none', {
+            expires: new Date(Date.now()),
+            httpOnly: true
+        });
+        let token= '';
+        return apiResponse.successResponseWithData(res, `Logged out successfully`, token);
+    };
+
 }
 
 module.exports = new UsersController();
