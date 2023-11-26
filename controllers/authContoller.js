@@ -3,7 +3,7 @@ const User = require('../models/users');
 const apiResponse = require("../helpers/apiResponse");
 const sendToken = require('../utils/jwtToken');
 const sendEmail = require('../utils/sendEmail');
-
+const crypto = require('crypto');
 
 
 class UsersController {
@@ -99,9 +99,42 @@ class UsersController {
             user.resetPasswordExpire = undefined;
 
             await user.save({ validateBeforeSave: false });
-            return apiResponse.ErrorResponse(res, `Email is not sent.`,error);
+            return apiResponse.ErrorResponse(res, `Email is not sent.`, error);
         }
 
+    };
+
+    // Reset Password   =>   /api/v1/password/reset/:token
+    resetPassword = async (req, res, next) => {
+        try {
+            // Hash url token
+            const resetPasswordToken = crypto
+                .createHash('sha256')
+                .update(req.params.token)
+                .digest('hex');
+
+            const user = await User.findOne({
+                resetPasswordToken,
+                resetPasswordExpire: { $gt: Date.now() }
+            });
+
+            if (!user) {
+                return apiResponse.validationErrorWithData(res, `Password Reset token is invalid or has been expired.`);
+            }
+
+            // Setup new password
+            user.password = req.body.password;
+
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+
+            await user.save();
+
+            sendToken(user, res);
+        } catch (error) {
+            // Pass the error to the next middleware
+            next(error);
+        }
     };
 
 }
