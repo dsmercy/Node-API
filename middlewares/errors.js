@@ -22,12 +22,12 @@ module.exports = (err, req, res, next) => {
 
         // Handling Wrong JWT token error
         if(err.name === 'JsonWebTokenError') {
-            return apiResponse.ErrorResponse(res, `JSON Web token is invalid. Try Again!`, err);
+            return apiResponse.ErrorResponse(res, `JSON Web token is invalid. Try Again!`);
         }
 
         // Handling Expired JWT token error
         if(err.name === 'TokenExpiredError') {
-            return apiResponse.ErrorResponse(res, `JSON Web token is expired. Try Again!`, err);
+            return apiResponse.ErrorResponse(res, `JSON Web token is expired. Try Again!`);
         }
 
         // Handle mongoose duplicate key error

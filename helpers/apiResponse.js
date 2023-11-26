@@ -19,7 +19,7 @@ exports.ErrorResponse = function (res, msg, err) {
 	var data = {
 		success: false,
 		message: msg,
-		stack : err.stack
+		stack : err && err.stack
 	};
 	return res.status(500).json(data);
 };
