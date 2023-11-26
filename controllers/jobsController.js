@@ -47,8 +47,10 @@ class JobsController {
     // Get all Jobs  =>  /api/v1/jobs
     newJob = async (req, res, next) => {
         try {
-            // let job = {};
-            let job =  await Job.create(req.body);
+            // Adding user to body
+            req.body.user = req.user.id;
+
+            let job = await Job.create(req.body);
 
             return apiResponse.successResponseWithData(res, "Job Created!", job);
         } catch (error) {
