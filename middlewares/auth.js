@@ -25,3 +25,13 @@ exports.isAuthenticatedUser = async (req, res, next) => {
         next(error);
     }
 };
+
+// handling users roles
+exports.authorizeRoles = (...roles) => {
+    return (req, res, next) => {
+        if(!roles.includes(req.user.role)) {
+            return apiResponse.unauthorizedResponse(res, `Role: (${req.user.role}) is not allowed to access this resource.`);
+        }
+        next();
+    }
+}
